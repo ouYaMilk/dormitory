@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DormitoryRoomMapper">
+
+    <resultMap type="DormitoryRoom" id="DormitoryRoomResult">
+        <result property="dormitoryId"    column="dormitory_id"    />
+        <result property="dormitoryFloor"    column="dormitory_floor"    />
+        <result property="dormitoryBuliding"    column="dormitory_buliding"    />
+        <result property="roomBalance"    column="room_balance"    />
+        <result property="state"    column="state"    />
+        <result property="point"    column="point"    />
+        <result property="roomCount"    column="room_count"    />
+    </resultMap>
+
+    <sql id="selectDormitoryRoomVo">
+        select dormitory_id, dormitory_floor, dormitory_buliding, room_balance, state, point, room_count from dormitory_room
+    </sql>
+
+    <select id="selectDormitoryRoomList" parameterType="DormitoryRoom" resultMap="DormitoryRoomResult">
+        <include refid="selectDormitoryRoomVo"/>
+        <where>
+            <if test="dormitoryId != null "> and dormitory_id like concat('%', #{dormitoryId},'%')</if>
+            <if test="dormitoryFloor != null "> and dormitory_floor = #{dormitoryFloor}</if>
+            <if test="dormitoryBuliding != null  and dormitoryBuliding != ''"> and dormitory_buliding = #{dormitoryBuliding}</if>
+            <if test="roomBalance != null "> and room_balance = #{roomBalance}</if>
+            <if test="state != null  and state != ''"> and state = #{state}</if>
+            <if test="point != null "> and point = #{point}</if>
+            <if test="roomCount != null "> and room_count = #{roomCount}</if>
+        </where>
+    </select>
+
+    <select id="selectDormitoryRoomByDormitoryId" parameterType="String" resultMap="DormitoryRoomResult">
+        <include refid="selectDormitoryRoomVo"/>
+        where dormitory_id = #{dormitoryId}
+    </select>
+
+    <select id="selectDormitoryRoomNum" parameterType="dormitoryMembers" resultType="int">
+        select room_count from dormitory_room where dormitory_id = #{dormitoryId}
+    </select>
+
+    <insert id="insertDormitoryRoom" parameterType="DormitoryRoom">
+        insert into dormitory_room
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dormitoryId != null">dormitory_id,</if>
+            <if test="dormitoryFloor != null">dormitory_floor,</if>
+            <if test="dormitoryBuliding != null">dormitory_buliding,</if>
+            <if test="roomBalance != null">room_balance,</if>
+            <if test="state != null">state,</if>
+            <if test="point != null">point,</if>
+            <if test="roomCount != null">room_count,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dormitoryId != null">#{dormitoryId},</if>
+            <if test="dormitoryFloor != null">#{dormitoryFloor},</if>
+            <if test="dormitoryBuliding != null">#{dormitoryBuliding},</if>
+            <if test="roomBalance != null">#{roomBalance},</if>
+            <if test="state != null">#{state},</if>
+            <if test="point != null">#{point},</if>
+            <if test="roomCount != null">#{roomCount},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDormitoryRoom" parameterType="DormitoryRoom">
+        update dormitory_room
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dormitoryFloor != null">dormitory_floor = #{dormitoryFloor},</if>
+            <if test="dormitoryBuliding != null">dormitory_buliding = #{dormitoryBuliding},</if>
+            <if test="roomBalance != null">room_balance = #{roomBalance},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="point != null">point = #{point},</if>
+            <if test="roomCount != null">room_count = #{roomCount},</if>
+        </trim>
+        where dormitory_id = #{dormitoryId}
+    </update>
+
+    <delete id="deleteDormitoryRoomByDormitoryId" parameterType="String">
+        delete from dormitory_room where dormitory_id = #{dormitoryId}
+    </delete>
+
+    <delete id="deleteDormitoryRoomByDormitoryIds" parameterType="String">
+        delete from dormitory_room where dormitory_id in
+        <foreach item="dormitoryId" collection="array" open="(" separator="," close=")">
+            #{dormitoryId}
+        </foreach>
+    </delete>
+</mapper>

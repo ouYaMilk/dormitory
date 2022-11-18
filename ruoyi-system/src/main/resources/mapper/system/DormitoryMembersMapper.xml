@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DormitoryMembersMapper">
+    
+    <resultMap type="DormitoryMembers" id="DormitoryMembersResult">
+        <result property="id"                  column="id"    />
+        <result property="stuId"               column="stu_id"    />
+        <result property="stuName"             column="stu_name"    />
+        <result property="stuMajor"            column="stu_major"    />
+        <result property="dormitoryFloor"      column="dormitory_floor"    />
+        <result property="dormitoryId"         column="dormitory_id"    />
+        <result property="dormitoryBuliding"   column="dormitory_buliding"    />
+    </resultMap>
+
+    <sql id="selectDormitoryMembersVo">
+        select id, stu_id, stu_name, stu_major, dormitory_floor, dormitory_id, dormitory_buliding from dormitory_members
+    </sql>
+
+    <select id="selectDormitoryMembersList" parameterType="DormitoryMembers" resultMap="DormitoryMembersResult">
+        <include refid="selectDormitoryMembersVo"/>
+        <where>  
+            <if test="stuId != null "> and stu_id = #{stuId}</if>
+            <if test="stuName != null  and stuName != ''"> and stu_name like concat('%', #{stuName}, '%')</if>
+            <if test="stuMajor != null  and stuMajor != ''"> and stu_major like concat('%' ,#{stuMajor},'%')</if>
+            <if test="dormitoryFloor != null "> and dormitory_floor = #{dormitoryFloor}</if>
+            <if test="dormitoryId != null  and dormitoryId != ''"> and dormitory_id like concat( '%',#{dormitoryId},'%')</if>
+            <if test="dormitoryBuliding != null  and dormitoryBuliding != ''"> and dormitory_buliding = #{dormitoryBuliding}</if>
+        </where>
+    </select>
+    
+    <select id="selectDormitoryMembersById" parameterType="Long" resultMap="DormitoryMembersResult">
+        <include refid="selectDormitoryMembersVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectDormitoryMembersByStuId" parameterType="string" resultType="int">
+        select count(*) from dormitory_room
+        where dormitory_id = #{roomId}
+    </select>
+        
+    <insert id="insertDormitoryMembers" parameterType="DormitoryMembers" useGeneratedKeys="true" keyProperty="id">
+        insert into dormitory_members
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stuId != null">stu_id,</if>
+            <if test="stuName != null">stu_name,</if>
+            <if test="stuMajor != null">stu_major,</if>
+            <if test="dormitoryFloor != null">dormitory_floor,</if>
+            <if test="dormitoryId != null">dormitory_id,</if>
+            <if test="dormitoryBuliding != null">dormitory_buliding,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="stuId != null">#{stuId},</if>
+            <if test="stuName != null">#{stuName},</if>
+            <if test="stuMajor != null">#{stuMajor},</if>
+            <if test="dormitoryFloor != null">#{dormitoryFloor},</if>
+            <if test="dormitoryId != null">#{dormitoryId},</if>
+            <if test="dormitoryBuliding != null">#{dormitoryBuliding},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDormitoryMembers" parameterType="DormitoryMembers">
+        update dormitory_members
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="stuId != null">stu_id = #{stuId},</if>
+            <if test="stuName != null">stu_name = #{stuName},</if>
+            <if test="stuMajor != null">stu_major = #{stuMajor},</if>
+            <if test="dormitoryFloor != null">dormitory_floor = #{dormitoryFloor},</if>
+            <if test="dormitoryId != null">dormitory_id = #{dormitoryId},</if>
+            <if test="dormitoryBuliding != null">dormitory_buliding = #{dormitoryBuliding},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDormitoryMembersById" parameterType="Long">
+        delete from dormitory_members where id = #{id}
+    </delete>
+
+    <delete id="deleteDormitoryMembersByIds" parameterType="String">
+        delete from dormitory_members where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

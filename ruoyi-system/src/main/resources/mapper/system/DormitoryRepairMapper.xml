@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DormitoryRepairMapper">
+    
+    <resultMap type="DormitoryRepair" id="DormitoryRepairResult">
+        <result property="repairId"    column="repair_id"    />
+        <result property="dormitoryBuliding"    column="dormitory_buliding"    />
+        <result property="repairerName"    column="repairer_name"    />
+        <result property="dormitoryId"    column="dormitory_id"    />
+        <result property="stuName"    column="stu_name"    />
+        <result property="repairStartTime"    column="repair_start_time"    />
+        <result property="repairContent"    column="repair_content"    />
+        <result property="repairPicture"    column="repair_picture"    />
+    </resultMap>
+
+    <sql id="selectDormitoryRepairVo">
+        select repair_id, dormitory_buliding,  dormitory_id, stu_name, repair_start_time, repair_content,repair_picture,repairer_name from dormitory_repair
+    </sql>
+
+    <select id="selectDormitoryRepairList" parameterType="DormitoryRepair" resultMap="DormitoryRepairResult">
+        <include refid="selectDormitoryRepairVo"/>
+        <where>
+            <if test="repairId != null  and repairId != ''"> and repair_id = #{repairId}</if>
+            <if test="dormitoryBuliding != null  and dormitoryBuliding != ''"> and dormitory_buliding = #{dormitoryBuliding}</if>
+            <if test="dormitoryId != null "> and dormitory_id like concat('%', #{dormitoryId},'%')</if>
+            <if test="stuName != null  and stuName != ''"> and stu_name like concat('%', #{stuName}, '%')</if>
+            <if test="repairStartTime != null "> DATE_FORMAT(repair_start_time, '%Y-%m-%d') = DATE_FORMAT(#{repairStartTime},'%Y-%m-%d')</if>
+            <if test="repairContent != null  and repairContent != ''"> and repair_content like concat('%', #{repairContent}, '%')</if>
+
+        </where>
+    </select>
+    
+    <select id="selectDormitoryRepairByRepairId" parameterType="Long" resultMap="DormitoryRepairResult">
+        <include refid="selectDormitoryRepairVo"/>
+        where repair_id = #{repairId}
+    </select>
+
+    <select id="selectDormitoryRePairByDormitoryId" parameterType="string" resultType="int">
+        select count(*) from dormitory_members
+        WHERE dormitory_id = #{dormitoryId}
+    </select>
+
+    <select id="selectDormitoryRePairByStuName" parameterType="string" resultType="int">
+        select count(*) from dormitory_members
+        WHERE stu_name = #{stuName}
+    </select>
+
+
+    <insert id="insertDormitoryRepair" parameterType="DormitoryRepair" useGeneratedKeys="true" keyProperty="repairId">
+        insert into dormitory_repair
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dormitoryBuliding != null">dormitory_buliding,</if>
+<!--            <if test="dormitoryFloor != null">dormitory_floor,</if>-->
+            <if test="dormitoryId != null">dormitory_id,</if>
+            <if test="stuName != null">stu_name,</if>
+            <if test="repairStartTime != null">repair_start_time,</if>
+            <if test="repairContent != null">repair_content,</if>
+            <if test="repairPicture != null">repair_picture,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dormitoryBuliding != null">#{dormitoryBuliding},</if>
+<!--            <if test="dormitoryFloor != null">#{dormitoryFloor},</if>-->
+            <if test="dormitoryId != null">#{dormitoryId},</if>
+            <if test="stuName != null">#{stuName},</if>
+            <if test="repairStartTime != null">#{repairStartTime},</if>
+            <if test="repairContent != null">#{repairContent},</if>
+            <if test="repairPicture != null">#{repairPicture},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDormitoryRepair" parameterType="DormitoryRepair">
+        update dormitory_repair
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dormitoryBuliding != null">dormitory_buliding = #{dormitoryBuliding},</if>
+<!--            <if test="dormitoryFloor != null">dormitory_floor = #{dormitoryFloor},</if>-->
+            <if test="dormitoryId != null">dormitory_id = #{dormitoryId},</if>
+            <if test="stuName != null">stu_name = #{stuName},</if>
+            <if test="repairStartTime != null">repair_start_time = #{repairStartTime},</if>
+            <if test="repairContent != null">repair_content = #{repairContent},</if>
+            <if test="repairPicture != null">repair_picture= #{repairPicture},</if>
+        </trim>
+        where repair_id = #{repairId}
+    </update>
+
+    <update id="updateDormitoryRepairByName" parameterType="DormitoryRepair">
+        update dormitory_repair
+        <trim prefix="SET" suffixOverrides=",">
+           repairer_name = #{repairerName}
+<!--            <if test="dormitoryFloor != null">dormitory_floor = #{dormitoryFloor},</if>-->
+<!--            <if test="dormitoryId != null">dormitory_id = #{dormitoryId},</if>-->
+<!--            <if test="stuName != null">stu_name = #{stuName},</if>-->
+<!--            <if test="repairStartTime != null">repair_start_time = #{repairStartTime},</if>-->
+<!--            <if test="repairContent != null">repair_content = #{repairContent},</if>-->
+<!--            <if test="repairPicture != null">repair_picture= #{repairPicture},</if>-->
+        </trim>
+        where repair_id = #{repairId}
+    </update>
+
+    <delete id="deleteDormitoryRepairByRepairId" parameterType="Long">
+        delete from dormitory_repair where repair_id = #{repairId}
+    </delete>
+
+    <delete id="deleteDormitoryRepairByRepairIds" parameterType="String">
+        delete from dormitory_repair where repair_id in 
+        <foreach item="repairId" collection="array" open="(" separator="," close=")">
+            #{repairId}
+        </foreach>
+    </delete>
+</mapper>

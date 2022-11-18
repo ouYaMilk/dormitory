@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DormitoryRoomPointMapper">
+
+    <resultMap type="DormitoryRoomPoint" id="DormitoryRoomPointResult">
+        <result property="pointKey" column="point_key"/>
+        <result property="dormitoryId" column="dormitory_id"/>
+        <result property="dormitoryFloor" column="dormitory_floor"/>
+        <result property="dormitoryBuliding" column="dormitory_buliding"/>
+        <result property="point" column="point"/>
+        <result property="pointDate" column="point_date"/>
+        <result property="detail" column="detail"/>
+        <result property="avgPoint" column="avg_point"/>
+        <result property="pointPicture" column="point_picture"/>
+    </resultMap>
+
+    <sql id="selectDormitoryRoomPointVo">
+        select point_key,
+               dormitory_id,
+               dormitory_floor,
+               dormitory_buliding,
+               point,
+               point_date,
+               detail,
+               avg_point ,
+               point_picture
+        from dormitory_room_point
+    </sql>
+
+    <select id="selectDormitoryRoomPointCount"  resultType="int">
+        select count(point_key) from dormitory_room_point
+    </select>
+
+    <select id="selectDormitoryRoomPointById"  resultType="int">
+        select count(*) from dormitory_room_point where dormitory_id = #{dormitoryId}
+    </select>
+
+
+    <select id="selectDormitoryRoomPointSum" resultType="int">
+        select sum(point) from dormitory_room_point
+    </select>
+
+    <select id="selectDormitoryRoomPointList" parameterType="DormitoryRoomPoint" resultMap="DormitoryRoomPointResult">
+        <include refid="selectDormitoryRoomPointVo"/>
+        <where>
+            <if test="dormitoryId != null  and dormitoryId != ''">and dormitory_id = #{dormitoryId}</if>
+            <if test="dormitoryFloor != null ">and dormitory_floor = #{dormitoryFloor}</if>
+            <if test="dormitoryBuliding != null  and dormitoryBuliding != ''">and dormitory_buliding = #{dormitoryBuliding}</if>
+            <if test="point != null ">and point = #{point}</if>
+            <if test="pointDate != null ">and point_date = #{pointDate}</if>
+            <if test="detail != null ">and detail like concat('%', #{detail}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectDormitoryRoomPointByDormitoryId" parameterType="String" resultMap="DormitoryRoomPointResult">
+        <include refid="selectDormitoryRoomPointVo"/>
+        where point_key = #{pointKey}
+    </select>
+
+    <insert id="insertDormitoryRoomPoint" parameterType="DormitoryRoomPoint">
+        insert into dormitory_room_point
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dormitoryId != null">dormitory_id,</if>
+            <if test="dormitoryFloor != null">dormitory_floor,</if>
+            <if test="dormitoryBuliding != null">dormitory_buliding,</if>
+            <if test="point != null">point,</if>
+            <if test="pointDate != null">point_date,</if>
+            <if test="detail != null">detail,</if>
+            <if test="pointPicture != null">point_picture,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dormitoryId != null">#{dormitoryId},</if>
+            <if test="dormitoryFloor != null">#{dormitoryFloor},</if>
+            <if test="dormitoryBuliding != null">#{dormitoryBuliding},</if>
+            <if test="point != null">#{point},</if>
+            <if test="pointDate != null">#{pointDate},</if>
+            <if test="detail != null">#{detail},</if>
+            <if test="pointPicture != null">#{pointPicture},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDormitoryRoomPoint" parameterType="DormitoryRoomPoint">
+        update dormitory_room_point
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dormitoryFloor != null">dormitory_floor = #{dormitoryFloor},</if>
+            <if test="dormitoryBuliding != null">dormitory_buliding = #{dormitoryBuliding},</if>
+            <if test="point != null">point = #{point},</if>
+            <if test="pointDate != null">point_date = #{pointDate},</if>
+            <if test="detail != null">detail = #{detail},</if>
+            <if test="pointPicture != null">point_picture = #{pointPicture},</if>
+            avg_point = #{avgPoint},
+        </trim>
+        where dormitory_id = #{dormitoryId}
+    </update>
+
+    <update id="updateDormitoryRoomPointById" parameterType="DormitoryRoomPoint">
+        update dormitory_room_point
+            set point = #{point}
+        where dormitory_id = #{dormitoryId}
+    </update>
+
+    <update id="updateDormitoryRoomPointAvgPoint" >
+        UPDATE dormitory_room_point set avg_point = #{a};
+    </update>
+
+    <delete id="deleteDormitoryRoomPointByDormitoryId" parameterType="String">
+        delete
+        from dormitory_room_point
+        where point_key = #{pointKeys}
+    </delete>
+
+    <delete id="deleteDormitoryRoomPointByDormitoryIds" parameterType="String">
+        delete from dormitory_room_point where point_key in
+        <foreach item="pointKey" collection="array" open="(" separator="," close=")">
+            #{pointKey}
+        </foreach>
+    </delete>
+</mapper>

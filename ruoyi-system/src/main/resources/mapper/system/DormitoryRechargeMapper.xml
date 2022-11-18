@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DormitoryRechargeMapper">
+    
+    <resultMap type="DormitoryRecharge" id="DormitoryRechargeResult">
+        <result property="rechargeId"    column="recharge_id"    />
+        <result property="dormitoryId"    column="dormitory_id"    />
+        <result property="stuId"    column="stu_id"    />
+        <result property="rechargeMoney"    column="recharge_money"    />
+        <result property="rechargeTime"    column="recharge_time"    />
+    </resultMap>
+
+    <sql id="selectDormitoryRechargeVo">
+        select recharge_id, dormitory_id, stu_id, recharge_money, recharge_time from dormitory_recharge
+    </sql>
+
+    <select id="selectDormitoryRechargeList" parameterType="DormitoryRecharge" resultMap="DormitoryRechargeResult">
+        <include refid="selectDormitoryRechargeVo"/>
+        <where>  
+            <if test="dormitoryId != null "> and dormitory_id like('%', #{dormitoryId},'%')</if>
+            <if test="stuId != null "> and stu_id = #{stuId}</if>
+<!--            <if test=" rechargeMoney ！=null and rechargeMoney = 300"> and recharge_money between 200 and #{rechargeMoney}</if>-->
+<!--            <if test=" rechargeMoney ！=null and rechargeMoney = 200"> and recharge_money between 100 and #{rechargeMoney}</if>-->
+<!--            <if test=" rechargeMoney ！=null "> and recharge_money between #{rechargeMoney}-100 and #{rechargeMoney}</if>-->
+<!--<choose>-->
+<!--    <when test="rechargeMoney ！=null and rechargeMoney ！='' and rechargeMoney = 100 "> and recharge_money between #{rechargeMoney}-100 and #{rechargeMoney}-1</when>-->
+<!--    <when test="rechargeMoney ！=null and rechargeMoney ！='' and rechargeMoney = 200 "> and recharge_money between #{rechargeMoney}-100 and #{rechargeMoney}-1</when>-->
+<!--    <when test="rechargeMoney ！=null and rechargeMoney ！='' and rechargeMoney = 300 "> and recharge_money >= #{rechargeMoney}-100 </when>-->
+<!--    <otherwise>-->
+<!--        AND recharge_money = #{recharge_money}-->
+<!--    </otherwise>-->
+<!--</choose>-->
+            <if test="rechargeMoney != null "> and recharge_money between #{rechargeMoney}-100 and #{rechargeMoney}</if>
+            <if test="rechargeTime != null "> and DATE_FORMAT(recharge_time, '%Y-%m-%d') = DATE_FORMAT(#{rechargeTime},'%Y-%m-%d')</if>
+        </where>
+    </select>
+
+    <select id="selectDormitoryRechargeByStuId" parameterType="long" resultType="int">
+        select count(*) from dormitory_members
+       WHERE stu_id = #{stuId}
+    </select>
+
+    <select id="selectDormitoryRechargeByDormitoryId" parameterType="string" resultType="int">
+        select count(*) from dormitory_members
+        WHERE dormitory_id = #{dormitoryId}
+    </select>
+    
+    <select id="selectDormitoryRechargeByRechargeId" parameterType="Long" resultMap="DormitoryRechargeResult">
+        <include refid="selectDormitoryRechargeVo"/>
+        where recharge_id = #{rechargeId}
+    </select>
+        
+    <insert id="insertDormitoryRecharge" parameterType="DormitoryRecharge" useGeneratedKeys="true" keyProperty="rechargeId">
+        insert into dormitory_recharge
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dormitoryId != null">dormitory_id,</if>
+            <if test="stuId != null">stu_id,</if>
+            <if test="rechargeMoney != null">recharge_money,</if>
+            <if test="rechargeTime != null">recharge_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dormitoryId != null">#{dormitoryId},</if>
+            <if test="stuId != null">#{stuId},</if>
+            <if test="rechargeMoney != null">#{rechargeMoney},</if>
+            <if test="rechargeTime != null">#{rechargeTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDormitoryRecharge" parameterType="DormitoryRecharge">
+        update dormitory_recharge
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dormitoryId != null">dormitory_id = #{dormitoryId},</if>
+            <if test="stuId != null">stu_id = #{stuId},</if>
+            <if test="rechargeMoney != null">recharge_money = #{rechargeMoney},</if>
+            <if test="rechargeTime != null">recharge_time = #{rechargeTime},</if>
+        </trim>
+        where recharge_id = #{rechargeId}
+    </update>
+
+    <delete id="deleteDormitoryRechargeByRechargeId" parameterType="Long">
+        delete from dormitory_recharge where recharge_id = #{rechargeId}
+    </delete>
+
+    <delete id="deleteDormitoryRechargeByRechargeIds" parameterType="String">
+        delete from dormitory_recharge where recharge_id in 
+        <foreach item="rechargeId" collection="array" open="(" separator="," close=")">
+            #{rechargeId}
+        </foreach>
+    </delete>
+</mapper>
